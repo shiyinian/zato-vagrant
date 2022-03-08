@@ -27,6 +27,7 @@ opts = GetoptLong.new(
   [ '--host-database-port',      GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--host-ssh-port',           GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--run-internal-tests',      GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--install-binaries',        GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--run-internal-qs-step-01', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--run-internal-qs-step-02', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--help',                    GetoptLong::OPTIONAL_ARGUMENT ], # This one is needed for vagrant --help to continue to work
@@ -61,6 +62,7 @@ Zato_Host_Server_Port       = ENV['Zato_Host_Server_Port']
 Zato_Host_LB_Port           = ENV['Zato_Host_LB_Port']
 Zato_Host_Database_Port     = ENV['Zato_Host_Database_Port']
 Zato_Host_SSH_Port          = ENV['Zato_Host_SSH_Port']
+Zato_Install_Binaries       = ENV['Zato_Install_Binaries'] || true
 Zato_Run_Internal_Tests     = ENV['Zato_Run_Internal_Tests']
 Zato_Run_Quickstart_Step_01 = ENV['Zato_Run_Quickstart_Step_01'] || true
 Zato_Run_Quickstart_Step_02 = ENV['Zato_Run_Quickstart_Step_02'] || true
@@ -90,12 +92,14 @@ opts.each do |opt, arg|
     when '--host-lb-port';            Zato_Host_LB_Port         = arg.to_s()
     when '--host-database-port';      Zato_Host_Database_Port   = arg.to_s()
     when '--host-ssh-port';           Zato_Host_SSH_Port        = arg.to_s()
+    when '--install-binaries';        Zato_Install_Binaries     = arg.to_s()
     when '--run-internal-tests';      Zato_Run_Internal_Tests   = arg.to_s()
     when '--run-internal-qs-step-01'; Zato_Run_Quickstart_Step_01 = arg.to_s()
     when '--run-internal-qs-step-02'; Zato_Run_Quickstart_Step_02 = arg.to_s()
   end
 end
 
+Zato_Install_Binaries       = Zato_Install_Binaries.to_s().downcase()       == "true"
 Zato_Run_Quickstart_Step_01 = Zato_Run_Quickstart_Step_01.to_s().downcase() == "true"
 Zato_Run_Quickstart_Step_02 = Zato_Run_Quickstart_Step_02.to_s().downcase() == "true"
 
@@ -109,16 +113,15 @@ Zato_Host_LB_Port        = Zato_Host_LB_Port        || 11223
 Zato_Host_SSH_Port       = Zato_Host_SSH_Port       || 2255
 
 if Zato_ODB_Type == "mysql"
+  Zato_ODB_Port = 3306
   Zato_Host_Database_Port  = Zato_Host_Database_Port  || Zato_Default_Host_MySQL_Port
   Zato_Use_MySQL = true
   Zato_Use_PostgreSQL = false
-elsif Zato_ODB_Type == "postgresql"
-  Zato_Host_Database_Port  = Zato_Host_Database_Port  || Zato_Default_Host_PostgreSQL_Port
-  Zato_Use_MySQL = false
-  Zato_Use_PostgreSQL = true
 else
-  Zato_Use_MySQL = false
-  Zato_Use_PostgreSQL = false
+  Zato_ODB_Port = 5432
+  Zato_Host_Database_Port  = Zato_Host_Database_Port  || Zato_Default_Host_PostgreSQL_Port
+  Zato_Use_MySQL = true
+  Zato_Use_PostgreSQL = true
 end
 
 Vagrant.configure("2") do |config|
@@ -163,6 +166,10 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder(Zato_User_Conf_Dir, "/opt/hot-deploy/user-conf", mount_options: ["uid=1002", "gid=1002"])
   end
 
+  if Zato_Extlib_Dir
+    config.vm.synced_folder(Zato_Extlib_Dir, "/tmp/zato-extlib", mount_options: ["uid=1002", "gid=1002"])
+  end
+
   if Zato_Enmasse_File
     config.vm.provision("file", source:Zato_Enmasse_File, destination:"/tmp/enmasse.yaml")
   end
@@ -196,6 +203,7 @@ Vagrant.configure("2") do |config|
       Zato_Has_Python_Reqs_In_Tmp: Zato_Has_Python_Reqs_In_Tmp,
       Zato_Hot_Deploy_Prefer_Snapshots: true,
       Zato_Firewall_Limit_To_Local_Connections: true,
+      Zato_Install_Binaries:   Zato_Install_Binaries,
       Zato_Run_Internal_Tests: Zato_Run_Internal_Tests,
       Zato_Run_Quickstart_Step_01: Zato_Run_Quickstart_Step_01,
       Zato_Run_Quickstart_Step_02: Zato_Run_Quickstart_Step_02,

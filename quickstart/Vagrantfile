@@ -37,6 +37,9 @@ opts = GetoptLong.new(
 # Extlib
 # Services
 
+Zato_Default_Host_MySQL_Port       = 3355
+Zato_Default_Host_PostgreSQL_Port = 5435
+
 Zato_SSH_Password           = ENV['Zato_SSH_Password']
 Zato_Dashboard_Password     = ENV['Zato_Dashboard_Password']
 Zato_IDE_Password           = ENV['Zato_IDE_Password']
@@ -93,8 +96,8 @@ opts.each do |opt, arg|
   end
 end
 
-Zato_Run_Quickstart_Step_01 = Zato_Run_Quickstart_Step_01.to_s.downcase == "true"
-Zato_Run_Quickstart_Step_02 = Zato_Run_Quickstart_Step_02.to_s.downcase == "true"
+Zato_Run_Quickstart_Step_01 = Zato_Run_Quickstart_Step_01.to_s().downcase() == "true"
+Zato_Run_Quickstart_Step_02 = Zato_Run_Quickstart_Step_02.to_s().downcase() == "true"
 
 # An IP address for the VM is always required - use the default one if none was given on input.
 Zato_Default_IP_Address = "192.168.56.177"
@@ -103,8 +106,20 @@ Zato_IP_Address = Zato_IP_Address || Zato_Default_IP_Address
 Zato_Host_Dashboard_Port = Zato_Host_Dashboard_Port || 8183
 Zato_Host_Server_Port    = Zato_Host_Server_Port    || 17010
 Zato_Host_LB_Port        = Zato_Host_LB_Port        || 11223
-Zato_Host_Database_Port  = Zato_Host_Database_Port  || 5435
 Zato_Host_SSH_Port       = Zato_Host_SSH_Port       || 2255
+
+if Zato_ODB_Type == "mysql"
+  Zato_Host_Database_Port  = Zato_Host_Database_Port  || Zato_Default_Host_MySQL_Port
+  Zato_Use_MySQL = true
+  Zato_Use_PostgreSQL = false
+elsif Zato_ODB_Type == "postgresql"
+  Zato_Host_Database_Port  = Zato_Host_Database_Port  || Zato_Default_Host_PostgreSQL_Port
+  Zato_Use_MySQL = false
+  Zato_Use_PostgreSQL = true
+else
+  Zato_Use_MySQL = false
+  Zato_Use_PostgreSQL = false
+end
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/focal64"
@@ -115,6 +130,7 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 8183,  host: Zato_Host_Dashboard_Port
   config.vm.network :forwarded_port, guest: 17010, host: Zato_Host_Server_Port
   config.vm.network :forwarded_port, guest: 11223, host: Zato_Host_LB_Port
+  config.vm.network :forwarded_port, guest: 3306,  host: Zato_Host_Database_Port
   config.vm.network :forwarded_port, guest: 5432,  host: Zato_Host_Database_Port
   config.vm.network :forwarded_port, guest: 22,    host: Zato_Host_SSH_Port
 
@@ -173,6 +189,8 @@ Vagrant.configure("2") do |config|
       Zato_ODB_Name:           Zato_ODB_Name,
       Zato_ODB_Username:       Zato_ODB_Username,
       Zato_ODB_Password:       Zato_ODB_Password,
+      Zato_Use_MySQL:          Zato_Use_MySQL,
+      Zato_Use_PostgreSQL:     Zato_Use_PostgreSQL,
       Zato_Save_Credentials: true,
       Zato_Root_Level_User: "vagrant",
       Zato_Has_Python_Reqs_In_Tmp: Zato_Has_Python_Reqs_In_Tmp,

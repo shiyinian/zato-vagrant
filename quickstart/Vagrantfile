@@ -32,6 +32,11 @@ opts = GetoptLong.new(
   [ '--help',                    GetoptLong::OPTIONAL_ARGUMENT ], # This one is needed for vagrant --help to continue to work
 )
 
+# User config
+# Enmasse
+# Extlib
+# Services
+
 Zato_SSH_Password           = ENV['Zato_SSH_Password']
 Zato_Dashboard_Password     = ENV['Zato_Dashboard_Password']
 Zato_IDE_Password           = ENV['Zato_IDE_Password']

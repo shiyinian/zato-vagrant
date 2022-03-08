@@ -147,6 +147,10 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder(Zato_User_Conf_Dir, "/opt/hot-deploy/user-conf", mount_options: ["uid=1002", "gid=1002"])
   end
 
+  if Zato_Enmasse_File
+    config.vm.provision("file", source:Zato_Enmasse_File, destination:"/tmp/enmasse.yaml")
+  end
+
   config.vm.synced_folder("../zato-ansible/quickstart", "/zato-ansible/quickstart")
 
   # Use Ansible for provisioning.

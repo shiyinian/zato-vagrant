@@ -93,6 +93,9 @@ opts.each do |opt, arg|
   end
 end
 
+Zato_Run_Quickstart_Step_01 = Zato_Run_Quickstart_Step_01.to_s.downcase == "true"
+Zato_Run_Quickstart_Step_02 = Zato_Run_Quickstart_Step_02.to_s.downcase == "true"
+
 # An IP address for the VM is always required - use the default one if none was given on input.
 Zato_Default_IP_Address = "192.168.56.177"
 Zato_IP_Address = Zato_IP_Address || Zato_Default_IP_Address

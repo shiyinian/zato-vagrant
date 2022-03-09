@@ -34,6 +34,8 @@ opts = GetoptLong.new(
   [ '--hashicorp-vault-token',   GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--run-internal-qs-step-01', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--run-internal-qs-step-02', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--pre-enmasse-script',      GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--post-install-script',     GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--help',                    GetoptLong::OPTIONAL_ARGUMENT ], # This one is needed for vagrant --help to continue to work
 )
 
@@ -74,6 +76,8 @@ Zato_Hashicorp_Vault_Token   = ENV['Zato_Hashicorp_Vault_Token']
 Zato_Run_Internal_Tests      = ENV['Zato_Run_Internal_Tests']
 Zato_Run_Quickstart_Step_01  = ENV['Zato_Run_Quickstart_Step_01'] || true
 Zato_Run_Quickstart_Step_02  = ENV['Zato_Run_Quickstart_Step_02'] || true
+Zato_Pre_Enmasse_Script      = ENV['Zato_Pre_Enmasse_Script']
+Zato_Post_Install_Script     = ENV['Zato_Post_Install_Script']
 
 opts.ordering=(GetoptLong::REQUIRE_ORDER)
 
@@ -108,6 +112,8 @@ opts.each do |opt, arg|
     when '--run-internal-tests';      Zato_Run_Internal_Tests     = arg.to_s()
     when '--run-internal-qs-step-01'; Zato_Run_Quickstart_Step_01 = arg.to_s()
     when '--run-internal-qs-step-02'; Zato_Run_Quickstart_Step_02 = arg.to_s()
+    when '--pre-enmasse-script';      Zato_Pre_Enmasse_Script     = arg.to_s()
+    when '--post-install-script';     Zato_Post_Install_Script    = arg.to_s()
   end
 end
 
@@ -166,8 +172,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider :virtualbox do |v|
     v.name = "zato.localhost"
-    v.memory = 2048
-    v.cpus = 2
+    v.memory = 4096
+    v.cpus = 4
     v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     v.customize ["modifyvm", :id, "--ioapic", "on"]
   end
@@ -203,6 +209,14 @@ Vagrant.configure("2") do |config|
 
   if Zato_Enmasse_File
     config.vm.provision("file", source:Zato_Enmasse_File, destination:"/tmp/enmasse.yaml")
+  end
+
+  if Zato_Pre_Enmasse_Script
+    config.vm.provision("file", source:Zato_Pre_Enmasse_Script, destination:"/tmp/zato-pre-enmasse-script.sh")
+  end
+
+  if Zato_Post_Install_Script
+    config.vm.provision("file", source:Zato_Post_Install_Script, destination:"/tmp/zato-post-install-script.sh")
   end
 
   config.vm.synced_folder("../zato-ansible/quickstart", "/zato-ansible/quickstart")

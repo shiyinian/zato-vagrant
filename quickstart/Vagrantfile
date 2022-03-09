@@ -28,6 +28,8 @@ opts = GetoptLong.new(
   [ '--host-ssh-port',           GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--run-internal-tests',      GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--install-binaries',        GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--use-hashicorp-vault',     GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--hashicorp-vault-token',   GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--run-internal-qs-step-01', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--run-internal-qs-step-02', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--help',                    GetoptLong::OPTIONAL_ARGUMENT ], # This one is needed for vagrant --help to continue to work
@@ -38,34 +40,36 @@ opts = GetoptLong.new(
 # Extlib
 # Services
 
-Zato_Default_Host_MySQL_Port       = 3355
+Zato_Default_Host_MySQL_Port      = 3355
 Zato_Default_Host_PostgreSQL_Port = 5435
 
-Zato_SSH_Password           = ENV['Zato_SSH_Password']
-Zato_Dashboard_Password     = ENV['Zato_Dashboard_Password']
-Zato_IDE_Password           = ENV['Zato_IDE_Password']
-Zato_Python_Reqs            = ENV['Zato_Python_Reqs']
-Zato_Hot_Deploy_Dir         = ENV['Zato_Hot_Deploy_Dir']
-Zato_User_Conf_Dir          = ENV['Zato_User_Conf_Dir']
-Zato_Extlib_Dir             = ENV['Zato_Extlib_Dir']
-Zato_Cluster_Name           = ENV['Zato_Cluster_Name']
-Zato_Enmasse_File           = ENV['Zato_Enmasse_File']
-Zato_ODB_Type               = ENV['Zato_ODB_Type']
-Zato_ODB_Hostname           = ENV['Zato_ODB_Hostname']
-Zato_ODB_Port               = ENV['Zato_ODB_Port']
-Zato_ODB_Name               = ENV['Zato_ODB_Name']
-Zato_ODB_Username           = ENV['Zato_ODB_Username']
-Zato_ODB_Password           = ENV['Zato_ODB_Password']
-Zato_IP_Address             = ENV['Zato_IP_Address']
-Zato_Host_Dashboard_Port    = ENV['Zato_Host_Dashboard_Port']
-Zato_Host_Server_Port       = ENV['Zato_Host_Server_Port']
-Zato_Host_LB_Port           = ENV['Zato_Host_LB_Port']
-Zato_Host_Database_Port     = ENV['Zato_Host_Database_Port']
-Zato_Host_SSH_Port          = ENV['Zato_Host_SSH_Port']
-Zato_Install_Binaries       = ENV['Zato_Install_Binaries'] || true
-Zato_Run_Internal_Tests     = ENV['Zato_Run_Internal_Tests']
-Zato_Run_Quickstart_Step_01 = ENV['Zato_Run_Quickstart_Step_01'] || true
-Zato_Run_Quickstart_Step_02 = ENV['Zato_Run_Quickstart_Step_02'] || true
+Zato_SSH_Password            = ENV['Zato_SSH_Password']
+Zato_Dashboard_Password      = ENV['Zato_Dashboard_Password']
+Zato_IDE_Password            = ENV['Zato_IDE_Password']
+Zato_Python_Reqs             = ENV['Zato_Python_Reqs']
+Zato_Hot_Deploy_Dir          = ENV['Zato_Hot_Deploy_Dir']
+Zato_User_Conf_Dir           = ENV['Zato_User_Conf_Dir']
+Zato_Extlib_Dir              = ENV['Zato_Extlib_Dir']
+Zato_Cluster_Name            = ENV['Zato_Cluster_Name']
+Zato_Enmasse_File            = ENV['Zato_Enmasse_File']
+Zato_ODB_Type                = ENV['Zato_ODB_Type']
+Zato_ODB_Hostname            = ENV['Zato_ODB_Hostname']
+Zato_ODB_Port                = ENV['Zato_ODB_Port']
+Zato_ODB_Name                = ENV['Zato_ODB_Name']
+Zato_ODB_Username            = ENV['Zato_ODB_Username']
+Zato_ODB_Password            = ENV['Zato_ODB_Password']
+Zato_IP_Address              = ENV['Zato_IP_Address']
+Zato_Host_Dashboard_Port     = ENV['Zato_Host_Dashboard_Port']
+Zato_Host_Server_Port        = ENV['Zato_Host_Server_Port']
+Zato_Host_LB_Port            = ENV['Zato_Host_LB_Port']
+Zato_Host_Database_Port      = ENV['Zato_Host_Database_Port']
+Zato_Host_SSH_Port           = ENV['Zato_Host_SSH_Port']
+Zato_Install_Binaries        = ENV['Zato_Install_Binaries'] || true
+Zato_Use_Hashicorp_Vault     = ENV['Zato_Use_Hashicorp_Vault'] || false
+Zato_Hashicorp_Vault_Token   = ENV['Zato_Hashicorp_Vault_Token']
+Zato_Run_Internal_Tests      = ENV['Zato_Run_Internal_Tests']
+Zato_Run_Quickstart_Step_01  = ENV['Zato_Run_Quickstart_Step_01'] || true
+Zato_Run_Quickstart_Step_02  = ENV['Zato_Run_Quickstart_Step_02'] || true
 
 opts.ordering=(GetoptLong::REQUIRE_ORDER)
 
@@ -92,16 +96,19 @@ opts.each do |opt, arg|
     when '--host-lb-port';            Zato_Host_LB_Port         = arg.to_s()
     when '--host-database-port';      Zato_Host_Database_Port   = arg.to_s()
     when '--host-ssh-port';           Zato_Host_SSH_Port        = arg.to_s()
-    when '--install-binaries';        Zato_Install_Binaries     = arg.to_s()
-    when '--run-internal-tests';      Zato_Run_Internal_Tests   = arg.to_s()
-    when '--run-internal-qs-step-01'; Zato_Run_Quickstart_Step_01 = arg.to_s()
-    when '--run-internal-qs-step-02'; Zato_Run_Quickstart_Step_02 = arg.to_s()
+    when '--install-binaries';        Zato_Install_Binaries        = arg.to_s()
+    when '--use-hashicorp-vault';     Zato_Use_Hashicorp_Vault = arg.to_s()
+    when '--hashicorp-vault-token';   Zato_Hashicorp_Vault_Token   = arg.to_s()
+    when '--run-internal-tests';      Zato_Run_Internal_Tests      = arg.to_s()
+    when '--run-internal-qs-step-01'; Zato_Run_Quickstart_Step_01  = arg.to_s()
+    when '--run-internal-qs-step-02'; Zato_Run_Quickstart_Step_02  = arg.to_s()
   end
 end
 
-Zato_Install_Binaries       = Zato_Install_Binaries.to_s().downcase()       == "true"
-Zato_Run_Quickstart_Step_01 = Zato_Run_Quickstart_Step_01.to_s().downcase() == "true"
-Zato_Run_Quickstart_Step_02 = Zato_Run_Quickstart_Step_02.to_s().downcase() == "true"
+Zato_Install_Binaries        = Zato_Install_Binaries.to_s().downcase()        == "true"
+Zato_Use_Hashicorp_Vault = Zato_Use_Hashicorp_Vault.to_s().downcase() == "true"
+Zato_Run_Quickstart_Step_01  = Zato_Run_Quickstart_Step_01.to_s().downcase()  == "true"
+Zato_Run_Quickstart_Step_02  = Zato_Run_Quickstart_Step_02.to_s().downcase()  == "true"
 
 # An IP address for the VM is always required - use the default one if none was given on input.
 Zato_Default_IP_Address = "192.168.56.177"
@@ -163,7 +170,7 @@ Vagrant.configure("2") do |config|
   end
 
   if Zato_User_Conf_Dir
-    config.vm.synced_folder(Zato_User_Conf_Dir, "/opt/hot-deploy/user-conf", mount_options: ["uid=1002", "gid=1002"])
+    config.vm.synced_folder(Zato_User_Conf_Dir, "/tmp/zato-user-conf", mount_options: ["uid=1002", "gid=1002"])
   end
 
   if Zato_Extlib_Dir
@@ -203,7 +210,9 @@ Vagrant.configure("2") do |config|
       Zato_Has_Python_Reqs_In_Tmp: Zato_Has_Python_Reqs_In_Tmp,
       Zato_Hot_Deploy_Prefer_Snapshots: true,
       Zato_Firewall_Limit_To_Local_Connections: true,
-      Zato_Install_Binaries:   Zato_Install_Binaries,
+      Zato_Install_Binaries: Zato_Install_Binaries,
+      Zato_Use_Hashicorp_Vault: Zato_Use_Hashicorp_Vault,
+      Zato_Hashicorp_Vault_Token: Zato_Hashicorp_Vault_Token,
       Zato_Run_Internal_Tests: Zato_Run_Internal_Tests,
       Zato_Run_Quickstart_Step_01: Zato_Run_Quickstart_Step_01,
       Zato_Run_Quickstart_Step_02: Zato_Run_Quickstart_Step_02,

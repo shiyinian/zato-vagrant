@@ -144,6 +144,19 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 5432,  host: Zato_Host_Database_Port
   config.vm.network :forwarded_port, guest: 22,    host: Zato_Host_SSH_Port
 
+  # Additiona, custom ports, free to use for anything that is needed inside the VM
+  config.vm.network :forwarded_port, guest: 30100, host: 30100
+  config.vm.network :forwarded_port, guest: 30101, host: 30101
+  config.vm.network :forwarded_port, guest: 30102, host: 30102
+  config.vm.network :forwarded_port, guest: 30103, host: 30103
+  config.vm.network :forwarded_port, guest: 30104, host: 30104
+
+  config.vm.network :forwarded_port, guest: 50100, host: 50100
+  config.vm.network :forwarded_port, guest: 50101, host: 50101
+  config.vm.network :forwarded_port, guest: 50102, host: 50102
+  config.vm.network :forwarded_port, guest: 50103, host: 50103
+  config.vm.network :forwarded_port, guest: 50104, host: 50104
+
   config.vm.provider :virtualbox do |v|
     v.name = "zato.localhost"
     v.memory = 2048

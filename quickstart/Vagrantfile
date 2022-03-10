@@ -256,6 +256,8 @@ Vagrant.configure("2") do |config|
       Zato_Run_Internal_Tests: Zato_Run_Internal_Tests,
       Zato_Run_Quickstart_Step_01: Zato_Run_Quickstart_Step_01,
       Zato_Run_Quickstart_Step_02: Zato_Run_Quickstart_Step_02,
+      Zato_Pre_Enmasse_Script: Zato_Pre_Enmasse_Script,
+      Zato_Post_Install_Script: Zato_Post_Install_Script,
     }
   end
 

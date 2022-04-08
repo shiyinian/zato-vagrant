@@ -13,8 +13,8 @@ git-sync:
 	git pull
 	cd ..
 	git add .
-	git commit -m "GH #1 - Pulling latest changes from zato-ansible."
-	git push
+	git commit -m "GH #1 - Pulling latest changes from zato-ansible." || true
+	git push || true
 
 echo:
 	echo Hello from zato-vagrant

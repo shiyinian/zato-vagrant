@@ -26,11 +26,9 @@ install-binaries:
 	sudo apt-get install virtualbox
 
 run-tests:
-	sudo apt-get install vagrant -y
-	cd $(CURDIR)/quickstart
-	vagrant destroy && vagrant --run-internal-qs-step-01=true --run-internal-qs-step-02=true --run-internal-tests=true up --provision
+	cd $(CURDIR)/quickstart && vagrant destroy -f && vagrant --run-internal-qs-step-01=true --run-internal-qs-step-02=true --run-internal-tests=true up --provision
 
-run-all:
+all-sync-install-test:
 	$(MAKE) git-sync
 	$(MAKE) install-binaries
 	$(MAKE) run-tests

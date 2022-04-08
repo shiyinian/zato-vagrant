@@ -16,6 +16,15 @@ git-sync:
 	git commit -m "GH #1 - Pulling latest changes from zato-ansible." || true
 	git push || true
 
+install-binaries:
+	curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+	sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+	sudo apt-get update && sudo apt-get install vagrant
+
+	wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
+	sudo apt-get update
+	sudo apt-get install virtualbox
+
 run-tests:
 	sudo apt-get install vagrant -y
 	cd $(CURDIR)/quickstart
@@ -23,6 +32,7 @@ run-tests:
 
 run-all:
 	$(MAKE) git-sync
+	$(MAKE) install-binaries
 	$(MAKE) run-tests
 
 echo:

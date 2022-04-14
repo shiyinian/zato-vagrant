@@ -120,6 +120,8 @@ opts.each do |opt, arg|
   end
 end
 
+Zato_VM_Name                 ||= Zato_VM_Name || "zato.localhost"
+
 Zato_Map_SSH_Dir             ||= Zato_Map_SSH_Dir.to_s().downcase()             == "true"
 Zato_Install_Binaries        ||= Zato_Install_Binaries.to_s().downcase()        == "true"
 Zato_Use_Hashicorp_Vault     ||= Zato_Use_Hashicorp_Vault.to_s().downcase()     == "true"

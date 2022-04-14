@@ -5,6 +5,7 @@
 require 'getoptlong'
 
 opts = GetoptLong.new(
+  [ '--vm-name',                 GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--ssh-password',            GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--dashboard-password',      GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--ide-password',            GetoptLong::OPTIONAL_ARGUMENT ],
@@ -47,6 +48,7 @@ opts = GetoptLong.new(
 Zato_Default_Host_MySQL_Port      = 3355
 Zato_Default_Host_PostgreSQL_Port = 5435
 
+Zato_VM_Name                 = ENV['Zato_VM_Name']
 Zato_SSH_Password            = ENV['Zato_SSH_Password']
 Zato_Dashboard_Password      = ENV['Zato_Dashboard_Password']
 Zato_IDE_Password            = ENV['Zato_IDE_Password']
@@ -83,6 +85,7 @@ opts.ordering=(GetoptLong::REQUIRE_ORDER)
 
 opts.each do |opt, arg|
   case opt
+    when '--vm-name';                 Zato_VM_Name              = arg.to_s()
     when '--ssh-password';            Zato_SSH_Password         = arg.to_s()
     when '--dashboard-password';      Zato_Dashboard_Password   = arg.to_s()
     when '--ide-password';            Zato_IDE_Password         = arg.to_s()
@@ -130,7 +133,7 @@ Zato_IP_Address = Zato_IP_Address || Zato_Default_IP_Address
 Zato_Host_Dashboard_Port ||= Zato_Host_Dashboard_Port || 8183
 Zato_Host_Server_Port    ||= Zato_Host_Server_Port    || 17010
 Zato_Host_LB_Port        ||= Zato_Host_LB_Port        || 11223
-Zato_Host_SSH_Port       ||= Zato_Host_SSH_Port       || 2255
+Zato_Host_SSH_Port       ||= Zato_Host_SSH_Port       || 22022
 
 if Zato_ODB_Type == "mysql"
   Zato_ODB_Port = 3306
@@ -149,7 +152,7 @@ Vagrant.configure("2") do |config|
   config.vm.network :private_network, ip: Zato_IP_Address
   config.ssh.forward_agent = true
 
-  config.vm.hostname = "zato.localhost"
+  config.vm.hostname = Zato_VM_Name
   config.vm.network :forwarded_port, guest: 8183,  host: Zato_Host_Dashboard_Port
   config.vm.network :forwarded_port, guest: 17010, host: Zato_Host_Server_Port
   config.vm.network :forwarded_port, guest: 11223, host: Zato_Host_LB_Port
@@ -171,7 +174,7 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 50104, host: 50104
 
   config.vm.provider :virtualbox do |v|
-    v.name = "zato.localhost"
+    v.name = Zato_VM_Name
     v.memory = 4096
     v.cpus = 4
     v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]

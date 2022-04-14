@@ -45,8 +45,8 @@ opts = GetoptLong.new(
 # Extlib
 # Services
 
-Zato_Default_Host_MySQL_Port      = 3355
-Zato_Default_Host_PostgreSQL_Port = 5435
+Zato_Default_Host_MySQL_Port      = 23306
+Zato_Default_Host_PostgreSQL_Port = 25432
 
 Zato_VM_Name                 = ENV['Zato_VM_Name']
 Zato_SSH_Password            = ENV['Zato_SSH_Password']
@@ -158,8 +158,8 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 8183,  host: Zato_Host_Dashboard_Port
   config.vm.network :forwarded_port, guest: 17010, host: Zato_Host_Server_Port
   config.vm.network :forwarded_port, guest: 11223, host: Zato_Host_LB_Port
-  config.vm.network :forwarded_port, guest: 3306,  host: Zato_Host_Database_Port
-  config.vm.network :forwarded_port, guest: 5432,  host: Zato_Host_Database_Port
+  config.vm.network :forwarded_port, guest: 3306,  host: Zato_Default_Host_MySQL_Port
+  config.vm.network :forwarded_port, guest: 5432,  host: Zato_Default_Host_PostgreSQL_Port
   config.vm.network :forwarded_port, guest: 22,    host: Zato_Host_SSH_Port
 
   # Additiona, custom ports, free to use for anything that is needed inside the VM

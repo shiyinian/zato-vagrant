@@ -26,7 +26,7 @@ install-binaries:
 	sudo apt-get install virtualbox
 
 run-tests:
-	cd $(CURDIR)/quickstart && vagrant destroy -f && vagrant --run-internal-qs-step-01=true --run-internal-qs-step-02=true --run-internal-tests=true up --provision
+	cd $(CURDIR)/quickstart && vagrant destroy -f && vagrant --vm-name=zatotest --run-internal-qs-step-01=true --run-internal-qs-step-02=true --run-internal-tests=true up --provision
 
 all-sync-install-test:
 	$(MAKE) git-sync

@@ -7,7 +7,6 @@ default: echo
 ZATO_ANSIBLE_DIR=$(CURDIR)/zato-ansible
 
 git-sync:
-	git submodule update --init --recursive
 	cd $(ZATO_ANSIBLE_DIR)
 	git checkout main
 	git pull

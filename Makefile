@@ -13,6 +13,7 @@ git-sync:
 	git pull
 	cd ..
 	git add .
+	git add zato-ansible
 	git commit -m "GH #1 - Pulling latest changes from zato-ansible." || true
 	git push || true
 

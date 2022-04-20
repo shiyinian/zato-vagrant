@@ -8,8 +8,8 @@ ZATO_ANSIBLE_DIR=$(CURDIR)/zato-ansible
 
 git-sync:
 	cd $(ZATO_ANSIBLE_DIR)
-	git checkout main
 	git pull
+	git checkout main
 	cd ..
 	git add .
 	git add zato-ansible

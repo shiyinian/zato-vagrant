@@ -5,6 +5,7 @@
 require 'getoptlong'
 
 opts = GetoptLong.new(
+  [ '--box-name',                GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--vm-name',                 GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--ssh-password',            GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--dashboard-password',      GetoptLong::OPTIONAL_ARGUMENT ],
@@ -33,6 +34,7 @@ opts = GetoptLong.new(
   [ '--install-binaries',        GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--use-hashicorp-vault',     GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--hashicorp-vault-token',   GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--install-playwright',      GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--run-internal-qs-step-01', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--run-internal-qs-step-02', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--pre-enmasse-script',      GetoptLong::OPTIONAL_ARGUMENT ],
@@ -48,6 +50,7 @@ opts = GetoptLong.new(
 Zato_Default_Host_MySQL_Port      = 23306
 Zato_Default_Host_PostgreSQL_Port = 25432
 
+Zato_Box_Name                = ENV['Zato_Box_Name']
 Zato_VM_Name                 = ENV['Zato_VM_Name']
 Zato_SSH_Password            = ENV['Zato_SSH_Password']
 Zato_Dashboard_Password      = ENV['Zato_Dashboard_Password']
@@ -75,6 +78,7 @@ Zato_Use_Hashicorp_Vault     = ENV['Zato_Use_Hashicorp_Vault'] || false
 Zato_Enable_Redis            = ENV['Zato_Enable_Redis'] || true
 Zato_Map_SSH_Dir             = ENV['Zato_Map_SSH_Dir'] || false
 Zato_Hashicorp_Vault_Token   = ENV['Zato_Hashicorp_Vault_Token']
+Zato_Install_Playwright      = ENV['Zato_Install_Playwright'] || true
 Zato_Run_Internal_Tests      = ENV['Zato_Run_Internal_Tests']
 Zato_Run_Quickstart_Step_01  = ENV['Zato_Run_Quickstart_Step_01'] || true
 Zato_Run_Quickstart_Step_02  = ENV['Zato_Run_Quickstart_Step_02'] || true
@@ -85,6 +89,7 @@ opts.ordering=(GetoptLong::REQUIRE_ORDER)
 
 opts.each do |opt, arg|
   case opt
+    when '--box-name';                Zato_Box_Name             = arg.to_s()
     when '--vm-name';                 Zato_VM_Name              = arg.to_s()
     when '--ssh-password';            Zato_SSH_Password         = arg.to_s()
     when '--dashboard-password';      Zato_Dashboard_Password   = arg.to_s()
@@ -112,15 +117,18 @@ opts.each do |opt, arg|
     when '--install-binaries';        Zato_Install_Binaries     = arg.to_s()
     when '--use-hashicorp-vault';     Zato_Use_Hashicorp_Vault  = arg.to_s()
     when '--hashicorp-vault-token';   Zato_Hashicorp_Vault_Token  = arg.to_s()
+    when '--install-playwright';      Zato_Install_Playwright     = arg.to_s()
     when '--run-internal-tests';      Zato_Run_Internal_Tests     = arg.to_s()
     when '--run-internal-qs-step-01'; Zato_Run_Quickstart_Step_01 = arg.to_s()
     when '--run-internal-qs-step-02'; Zato_Run_Quickstart_Step_02 = arg.to_s()
     when '--pre-enmasse-script';      Zato_Pre_Enmasse_Script     = arg.to_s()
     when '--post-install-script';     Zato_Post_Install_Script    = arg.to_s()
+    when '--post-install-script';     Zato_Post_Install_Script    = arg.to_s()
   end
 end
 
-Zato_VM_Name                 ||= Zato_VM_Name || "zato.localhost"
+Zato_Box_Name                ||= Zato_Box_Name || "gusztavvargadr/ubuntu-desktop"
+Zato_VM_Name                 ||= Zato_VM_Name  || "zato.localhost"
 
 Zato_Map_SSH_Dir             ||= Zato_Map_SSH_Dir.to_s().downcase()             == "true"
 Zato_Install_Binaries        ||= Zato_Install_Binaries.to_s().downcase()        == "true"
@@ -150,7 +158,7 @@ else
 end
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/focal64"
+  config.vm.box = Zato_Box_Name
   config.vm.network :private_network, ip: Zato_IP_Address
   config.ssh.forward_agent = true
 
@@ -229,7 +237,7 @@ Vagrant.configure("2") do |config|
   # Use Ansible for provisioning.
   config.vm.provision 'ansible_local' do |ansible|
     ansible.compatibility_mode = "2.0"
-    ansible.verbose = true
+    ansible.verbose = "vvv"
     ansible.playbook = "/zato-ansible/quickstart/zato-quickstart.yaml"
     ansible.extra_vars = {
       Zato_SSH_Password:       Zato_SSH_Password,
@@ -258,6 +266,7 @@ Vagrant.configure("2") do |config|
       Zato_Install_Binaries: Zato_Install_Binaries,
       Zato_Use_Hashicorp_Vault: Zato_Use_Hashicorp_Vault,
       Zato_Hashicorp_Vault_Token: Zato_Hashicorp_Vault_Token,
+      Zato_Install_Playwright: Zato_Install_Playwright,
       Zato_Run_Internal_Tests: Zato_Run_Internal_Tests,
       Zato_Run_Quickstart_Step_01: Zato_Run_Quickstart_Step_01,
       Zato_Run_Quickstart_Step_02: Zato_Run_Quickstart_Step_02,

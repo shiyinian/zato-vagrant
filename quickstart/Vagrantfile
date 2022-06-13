@@ -39,6 +39,7 @@ opts = GetoptLong.new(
   [ '--run-internal-qs-step-02', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--pre-enmasse-script',      GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--post-install-script',     GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--env-file',                GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--help',                    GetoptLong::OPTIONAL_ARGUMENT ], # This one is needed for vagrant --help to continue to work
 )
 
@@ -84,6 +85,7 @@ Zato_Run_Quickstart_Step_01  = ENV['Zato_Run_Quickstart_Step_01'] || true
 Zato_Run_Quickstart_Step_02  = ENV['Zato_Run_Quickstart_Step_02'] || true
 Zato_Pre_Enmasse_Script      = ENV['Zato_Pre_Enmasse_Script']
 Zato_Post_Install_Script     = ENV['Zato_Post_Install_Script']
+Zato_Env_File                = ENV['Zato_Env_File']
 
 opts.ordering=(GetoptLong::REQUIRE_ORDER)
 
@@ -124,6 +126,7 @@ opts.each do |opt, arg|
     when '--pre-enmasse-script';      Zato_Pre_Enmasse_Script     = arg.to_s()
     when '--post-install-script';     Zato_Post_Install_Script    = arg.to_s()
     when '--post-install-script';     Zato_Post_Install_Script    = arg.to_s()
+    when '--env-file';                Zato_Env_File               = arg.to_s()
   end
 end
 
@@ -232,6 +235,10 @@ Vagrant.configure("2") do |config|
     config.vm.provision("file", source:Zato_Post_Install_Script, destination:"/tmp/zato-post-install-script.sh")
   end
 
+  if Zato_Env_File
+    config.vm.provision("file", source:Zato_Env_File, destination:"/tmp/env-file.ini")
+  end
+
   config.vm.synced_folder("../zato-ansible/quickstart", "/zato-ansible/quickstart")
 
   # Use Ansible for provisioning.
@@ -272,6 +279,7 @@ Vagrant.configure("2") do |config|
       Zato_Run_Quickstart_Step_02: Zato_Run_Quickstart_Step_02,
       Zato_Pre_Enmasse_Script: Zato_Pre_Enmasse_Script,
       Zato_Post_Install_Script: Zato_Post_Install_Script,
+      Zato_Env_File: Zato_Env_File,
     }
   end
 

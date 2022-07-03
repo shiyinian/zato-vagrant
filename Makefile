@@ -24,3 +24,12 @@ all-sync-install-test:
 
 echo:
 	echo Hello from zato-vagrant
+
+serve:
+	cd $(CURDIR)/quickstart && \
+		vagrant \
+		--host-dashboard-port=8185 \
+		--host-server-port=17085 \
+		--host-lb-port=11285 \
+		--host-ssh-port=22085 \
+		up

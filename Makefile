@@ -32,4 +32,5 @@ serve:
 		--host-server-port=17085 \
 		--host-lb-port=11285 \
 		--host-ssh-port=22085 \
-		up
+		up \
+		--provision

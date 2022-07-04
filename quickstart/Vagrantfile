@@ -173,7 +173,7 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 5432,  host: Zato_Default_Host_PostgreSQL_Port
   config.vm.network :forwarded_port, guest: 22,    host: Zato_Host_SSH_Port
 
-  # Additiona, custom ports, free to use for anything that is needed inside the VM
+  # Additional, custom ports, free to use for anything that is needed inside the VM
   config.vm.network :forwarded_port, guest: 30100, host: 30100
   config.vm.network :forwarded_port, guest: 30101, host: 30101
   config.vm.network :forwarded_port, guest: 30102, host: 30102

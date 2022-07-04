@@ -34,3 +34,7 @@ serve:
 		--host-ssh-port=22085 \
 		up \
 		--provision
+
+ssh:
+	cd $(CURDIR)/quickstart && \
+		vagrant ssh

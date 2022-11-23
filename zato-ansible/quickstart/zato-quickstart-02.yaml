@@ -16,9 +16,9 @@
   become: true
   become_user: "vagrant"
   shell: |
-    npm i -D @playwright/test &&
-    NODE_TLS_REJECT_UNAUTHORIZED="0" npx playwright install &&
-    pip install playwright &&
+    npm i -D @playwright/test 
+    NODE_TLS_REJECT_UNAUTHORIZED="0" npx playwright install 
+    pip install playwright 
     echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
 
 - name: Install Geany (for Playwright) (02)
